@@ -1,171 +1,4 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { useAccount, useDisconnect } from "wagmi"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Shield, Wallet, LogOut, Activity, RefreshCw } from "lucide-react"
-import Link from "next/link"
-import { redirect } from "next/navigation"
-import { HealthFactorGauge } from "@/components/health-factor-gauge"
-import { RiskMeter } from "@/components/risk-meter"
-import { PriceSimulation } from "@/components/price-simulation"
-import { NetworkSelector, networks, type Network } from "@/components/network-selector"
-
-// Import your new Aave integration
-import { getUserAccountData, type UserAccountData } from "@/lib/aave-integration"
-
-// Mock data for demo purposes (keep for fallback)
-import { mockPositionData } from "@/data/mockPosition"
-import { mockEvents } from "@/data/mockEvents";
-import { mockPositionDataByNetwork } from "@/data/mockPositionData"
-import { mockEventsByNetwork } from "@/data/mockEventByNetwork"
-
-type Event =
-  | { id: number; type: "protection"; message: string; timestamp: string; saved: number }
-  | { id: number; type: "warning"; message: string; timestamp: string; saved?: undefined }
-  | { id: number; type: "info"; message: string; timestamp: string; saved?: undefined };
-
-export default function DashboardPage() {
-  const { address, isConnected } = useAccount()
-  const { disconnect } = useDisconnect()
-  
-  // States for real Aave data
-  const [aaveData, setAaveData] = useState<UserAccountData | null>(null)
-  const [isLoadingAave, setIsLoadingAave] = useState(false)
-  const [aaveError, setAaveError] = useState<string | null>(null)
-  
-  // Existing states
-  const [isSimulating, setIsSimulating] = useState(false)
-  const [events, setEvents] = useState<Event[]>(mockEventsByNetwork.ethereum)
-  const [showProtectionEffect, setShowProtectionEffect] = useState(false)
-  const [selectedNetwork, setSelectedNetwork] = useState<Network>(networks[0])
-  const [currentHealthFactor, setCurrentHealthFactor] = useState(mockPositionDataByNetwork.ethereum.healthFactor)
-
-  // Function to fetch real Aave data
-  const fetchAaveData = async () => {
-    if (!address) return;
-
-    setIsLoadingAave(true);
-    setAaveError(null);
-
-    try {
-      console.log('🚀 Fetching Aave data for:', address);
-      console.log('🌐 Network:', selectedNetwork.id);
-
-      const data = await getUserAccountData(address, selectedNetwork.id); // Change to selectedNetwork.id for dynamic network
-      
-      console.log('✅ Aave data received:', data);
-      setAaveData(data);
-      
-      // Update health factor for your existing components
-      setCurrentHealthFactor(Number(data.healthFactor));
-
-      // Add success event to log
-      const successEvent: Event = {
-        id: events.length + 1,
-        type: "info",
-        message: `Successfully loaded real Aave data from ${data.networkName}`,
-        timestamp: "Just now",
-      };
-      setEvents(prev => [successEvent, ...prev]);
-
-    } catch (error) {
-      console.error('❌ Failed to fetch Aave data:', error);
-      setAaveError(error instanceof Error ? error.message : 'Unknown error');
-      
-      // Add error event to log
-      const errorEvent: Event = {
-        id: events.length + 1,
-        type: "warning",
-        message: `Failed to load Aave data: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        timestamp: "Just now",
-      };
-      setEvents(prev => [errorEvent, ...prev]);
-    } finally {
-      setIsLoadingAave(false);
-    }
-  };
-
-  // Load Aave data when user connects or network changes
-  useEffect(() => {
-    if (isConnected && address) {
-      fetchAaveData();
-    }
-  }, [address, isConnected, selectedNetwork]);
-
-  // Handle mock data fallback for network changes
-  useEffect(() => {
-    if (!aaveData) {
-      const networkData = mockPositionDataByNetwork[selectedNetwork.id as keyof typeof mockPositionDataByNetwork]
-      const networkEvents = mockEventsByNetwork[selectedNetwork.id as keyof typeof mockEventsByNetwork]
-
-      setCurrentHealthFactor(networkData.healthFactor)
-      setEvents(networkEvents)
-    }
-  }, [selectedNetwork, aaveData])
-
-  // Redirect if not connected
-  useEffect(() => {
-    if (!isConnected) {
-      redirect("/")
-    }
-  }, [isConnected])
-
-  if (!isConnected) {
-    return null
-  }
-
-  // Use real Aave data if available, otherwise fallback to mock data
-  const positionData = aaveData || mockPositionDataByNetwork[selectedNetwork.id as keyof typeof mockPositionDataByNetwork]
-
-  const getRiskLevel = (hf: number) => {
-    if (hf >= 1.5) return { level: "Safe", color: "bg-green-500" }
-    if (hf >= 1.2) return { level: "At Risk", color: "bg-yellow-500" }
-    return { level: "Danger", color: "bg-red-500" }
-  }
-
-  const handleSimulationStart = () => {
-    setIsSimulating(true)
-  }
-
-  const handleSimulationEnd = () => {
-    setIsSimulating(false)
-    const newEvent = {
-      id: events.length + 1,
-      type: "protection" as const,
-      message: "DeFi Track successfully protected position during simulation",
-      timestamp: "Just now",
-      saved: Math.floor(Math.random() * 500) + 500,
-    }
-    setEvents([newEvent, ...events])
-  }
-
-  const handleProtectionTrigger = () => {
-    setShowProtectionEffect(true)
-    setTimeout(() => setShowProtectionEffect(false), 3000)
-  }
-
-  const handleNetworkChange = (network: Network) => {
-    setSelectedNetwork(network)
-    // Clear previous Aave data when switching networks
-    setAaveData(null)
-    
-    const switchEvent = {
-      id: events.length + 1,
-      type: "info" as const,
-      message: `Switched to ${network.name} network`,
-      timestamp: "Just now",
-    }
-    setEvents([switchEvent, ...events])
-  }
-
-  const risk = getRiskLevel(currentHealthFactor)
-
-  return (
-    <div className="min-h-screen bg-background">
+<div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -399,7 +232,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Debug info (remove in production) */}
-        {process.env.NEXT_PUBLIC_TEST === 'development' && (
+        {process.env.NODE_ENV === 'development' && (
           <Card className="border-blue-200 bg-blue-50">
             <CardHeader>
               <CardTitle className="text-blue-800">Debug: Aave Data Status</CardTitle>
@@ -411,10 +244,7 @@ export default function DashboardPage() {
                 <div className="text-red-700">Error: {aaveError}</div>
               ) : aaveData ? (
                 <pre className="text-xs text-blue-700 overflow-auto">
-                  {JSON.stringify(aaveData, (key, value) => {
-                    // Convert BigInt to string for JSON serialization
-                    return typeof value === 'bigint' ? value.toString() : value;
-                  }, 2)}
+                  {JSON.stringify(aaveData, null, 2)}
                 </pre>
               ) : (
                 <div className="text-gray-700">No Aave data loaded (using mock data)</div>
@@ -424,5 +254,3 @@ export default function DashboardPage() {
         )}
       </div>
 </div>
-  )
-}

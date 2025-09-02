@@ -1,0 +1,38 @@
+export const mockPositionDataByNetwork = {
+  ethereum: {
+    collateral: 15000,
+    debt: 8500,
+    healthFactor: 1.76,
+    liquidationThreshold: 1.0,
+    collateralAsset: "ETH",
+    debtAsset: "USDC",
+    apy: 3.2,
+  },
+  base: {
+    collateral: 8200,
+    debt: 4100,
+    healthFactor: 2.1,
+    liquidationThreshold: 1.0,
+    collateralAsset: "ETH",
+    debtAsset: "USDbC",
+    apy: 2.8,
+  },
+  optimism: {
+    collateral: 12500,
+    debt: 7800,
+    healthFactor: 1.45,
+    liquidationThreshold: 1.0,
+    collateralAsset: "ETH",
+    debtAsset: "USDC",
+    apy: 3.5,
+  },
+  sepolia: {
+    collateral: 5000,
+    debt: 2200,
+    healthFactor: 2.8,
+    liquidationThreshold: 1.0,
+    collateralAsset: "ETH",
+    debtAsset: "USDC",
+    apy: 4.1,
+  },
+}

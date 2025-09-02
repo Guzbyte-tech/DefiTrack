@@ -1,9 +1,9 @@
 import { createConfig, http } from "wagmi"
-import { mainnet, sepolia } from "wagmi/chains"
+import { mainnet, sepolia, optimismSepolia, baseSepolia } from "wagmi/chains"
 import { metaMask, walletConnect } from "wagmi/connectors"
 
 export const config = createConfig({
-  chains: [mainnet, sepolia],
+  chains: [mainnet, sepolia, optimismSepolia, baseSepolia],
   connectors: [
     metaMask(),
     walletConnect({
@@ -13,5 +13,7 @@ export const config = createConfig({
   transports: {
     [mainnet.id]: http(),
     [sepolia.id]: http(),
+    [optimismSepolia.id]: http(),
+    [baseSepolia.id]: http(),
   },
 })
