@@ -15,7 +15,6 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "DeFi Track - Real-Time Liquidation Protection",
   description: "Real-Time Liquidation Protection Protocol for DeFi positions",
-  generator: "v0.app",
 }
 
 export default function RootLayout({

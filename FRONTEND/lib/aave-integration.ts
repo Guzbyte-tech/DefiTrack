@@ -1,6 +1,7 @@
 // /lib/aave-integration.ts
 import { ethers } from 'ethers';
 import { formatHealthFactor } from './utils';
+import { POOL_ABI } from '@/Abis/poolAbi';
 
 // Type definitions
 export interface NetworkConfig {
@@ -45,7 +46,7 @@ export const NETWORK_CONFIGS: Record<string, NetworkConfig> = {
     name: 'Ethereum Sepolia Testnet',
     chainId: 11155111,
     rpcUrl: process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL!,
-    aavePoolAddress: '0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951', // Aave V3 Pool Sepolia
+    aavePoolAddress: '0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951', // Aave V3 Pool Sepolia 
   },
   optimism: {
     name: 'Optimism Sepolia Testnet', 
@@ -64,27 +65,9 @@ export const NETWORK_CONFIGS: Record<string, NetworkConfig> = {
     name: 'Base Sepolia Testnet',
     chainId: 84532,
     rpcUrl: process.env.NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL!,
-    aavePoolAddress: '0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b', // Aave V3 Pool Base Sepolia
+    aavePoolAddress: '0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27', // Aave V3 Pool Base Sepolia 
   },
 };
-
-// Simple ABI for getUserAccountData function
-const POOL_ABI = [
-  {
-    "inputs": [{"internalType": "address", "name": "user", "type": "address"}],
-    "name": "getUserAccountData",
-    "outputs": [
-      {"internalType": "uint256", "name": "totalCollateralBase", "type": "uint256"},
-      {"internalType": "uint256", "name": "totalDebtBase", "type": "uint256"},
-      {"internalType": "uint256", "name": "availableBorrowsBase", "type": "uint256"},
-      {"internalType": "uint256", "name": "currentLiquidationThreshold", "type": "uint256"},
-      {"internalType": "uint256", "name": "ltv", "type": "uint256"},
-      {"internalType": "uint256", "name": "healthFactor", "type": "uint256"}
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-] as const;
 
 // Simple function to get user data from Aave
 export async function getUserAccountData(

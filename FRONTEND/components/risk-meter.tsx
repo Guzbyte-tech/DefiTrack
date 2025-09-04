@@ -19,6 +19,8 @@ export function RiskMeter({ healthFactor, animated = true }: RiskMeterProps) {
   }
 
   const getRiskLevel = (hf: number) => {
+    console.log("Health Factor:", hf);
+    if (isNaN(hf)) return { level: "Unknown", color: "text-gray-400", icon: AlertTriangle, bg: "bg-gray-500" }
     if (hf >= 1.5) return { level: "Safe", color: "text-green-400", icon: Shield, bg: "bg-green-500" }
     if (hf >= 1.2) return { level: "At Risk", color: "text-yellow-400", icon: AlertTriangle, bg: "bg-yellow-500" }
     return { level: "High Risk", color: "text-red-400", icon: AlertTriangle, bg: "bg-red-500" }

@@ -22,6 +22,7 @@ import { mockPositionData } from "@/data/mockPosition"
 import { mockEvents } from "@/data/mockEvents";
 import { mockPositionDataByNetwork } from "@/data/mockPositionData"
 import { mockEventsByNetwork } from "@/data/mockEventByNetwork"
+import { AavePositions } from "@/components/aave-positions"
 
 type Event =
   | { id: number; type: "protection"; message: string; timestamp: string; saved: number }
@@ -42,7 +43,7 @@ export default function DashboardPage() {
   const [events, setEvents] = useState<Event[]>(mockEventsByNetwork.ethereum)
   const [showProtectionEffect, setShowProtectionEffect] = useState(false)
   const [selectedNetwork, setSelectedNetwork] = useState<Network>(networks[0])
-  const [currentHealthFactor, setCurrentHealthFactor] = useState(mockPositionDataByNetwork.ethereum.healthFactor)
+  const [currentHealthFactor, setCurrentHealthFactor] = useState(0)
 
   // Function to fetch real Aave data
   const fetchAaveData = async () => {
@@ -146,6 +147,16 @@ export default function DashboardPage() {
   const handleProtectionTrigger = () => {
     setShowProtectionEffect(true)
     setTimeout(() => setShowProtectionEffect(false), 3000)
+  }
+
+  const handleApprovalEvent = (message: string) => {
+    const approvalEvent = {
+      id: events.length + 1,
+      type: "info" as const,
+      message,
+      timestamp: "Just now",
+    }
+    setEvents([approvalEvent, ...events])
   }
 
   const handleNetworkChange = (network: Network) => {
@@ -345,6 +356,8 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        <AavePositions networkName={selectedNetwork.name} onApprovalEvent={handleApprovalEvent} />
 
         {/* Enhanced Price Simulation */}
         <PriceSimulation

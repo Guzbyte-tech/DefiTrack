@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 
-export function formatHealthFactor(healthFactorBigInt: bigint): string {
+export function formatHealthFactor(healthFactorBigInt: bigint): any {
   // Aave returns type(uint256).max when user has no debt (infinite health factor)
   const maxUint256 = BigInt('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff');
   
